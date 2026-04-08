@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Operating System — April 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0B1929;--card:#111F33;--border:#1E3450;--text:#E8ECF1;--text-muted:#8899AB;--text-dim:#5A6B7D;--teal:#00C9C8;--teal-dim:#00C9C820;--coral:#FF6B6B;--coral-dim:#FF6B6B20;--gold:#F4C430;--gold-dim:#F4C43020;--green:#34D399;--green-dim:#34D39920;--blue:#3B82F6;--blue-dim:#3B82F620;--purple:#A78BFA}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.dash{max-width:1400px;margin:0 auto;padding:32px 24px}
+.header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.header h1{font-size:26px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-sub{font-size:13px;color:var(--text-dim);margin-top:4px}
+.header-meta{text-align:right}
+.header-meta .date{font-size:14px;color:var(--text-muted);font-family:'JetBrains Mono',monospace}
+.header-meta .quarter{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid var(--border)}
+.tab{padding:12px 24px;font-size:13px;font-weight:500;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;letter-spacing:.3px}
+.tab:hover{color:var(--text-muted)}.tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+.tab-num{font-family:'JetBrains Mono',monospace;font-size:11px;margin-right:6px;opacity:.5}
+.tab-content{display:none}.tab-content.active{display:block}
+.north-stars{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.star{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.star:hover{border-color:var(--teal)}
+.star-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px}
+.star-value{font-size:34px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1}
+.star-sub{font-size:11px;color:var(--text-dim);margin-top:6px}
+.star-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0}
+.star .glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.12;filter:blur(20px)}
+.star .drill{position:absolute;bottom:8px;right:12px;font-size:10px;color:var(--text-dim);opacity:0;transition:opacity .2s}
+.star:hover .drill{opacity:1}
+.star-na{cursor:default}.star-na:hover{border-color:var(--border)}.star-na .drill{display:none}
+.section{margin-bottom:28px}
+.section-title{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';display:block;width:16px;height:2px;background:var(--teal)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:border-color .2s;position:relative}
+.card:hover{border-color:var(--teal)}
+.card .drill{position:absolute;bottom:8px;right:12px;font-size:10px;color:var(--text-dim);opacity:0;transition:opacity .2s}
+.card:hover .drill{opacity:1}
+.card-s{cursor:default}.card-s:hover{border-color:var(--border)}.card-s .drill{display:none}
+.delivery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.area-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.area-name{font-size:15px;font-weight:600}
+.area-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-weight:500}
+.area-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.area-stat-label{font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px}
+.area-stat-value{font-size:17px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.area-bar{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;margin-bottom:10px}
+.area-bar-fill{height:100%;border-radius:3px}
+.area-focus{font-size:11px;color:var(--text-dim);line-height:1.5}
+.area-focus span{color:var(--text-muted);font-weight:500}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-title{font-size:14px;font-weight:600;margin-bottom:14px}
+.intel-row-item{display:flex;justify-content:space-between;align-items:center;padding:7px 4px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:4px}
+.intel-row-item:hover{background:#ffffff08}.intel-row-item:last-child{border:none}
+.intel-label{font-size:12px;color:var(--text-muted);min-width:140px}
+.intel-bar-wrap{flex:1;margin:0 12px;height:4px;background:var(--bg);border-radius:2px;max-width:140px}
+.intel-bar{height:100%;border-radius:2px}
+.intel-pct{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:500;min-width:40px;text-align:right}
+.intel-status{font-size:10px;min-width:70px;text-align:right;text-transform:uppercase;letter-spacing:.5px}
+.theme-list{list-style:none;padding:0}
+.theme-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted);line-height:1.5}
+.theme-list li:last-child{border:none}
+.theme-list li strong{color:var(--text);font-weight:500}
+.churn-tag{display:inline-block;font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid;margin:3px 4px 3px 0;cursor:pointer;transition:opacity .15s}
+.churn-tag:hover{opacity:.8}
+.alert-prod{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:4px}
+.alert-prod:hover{background:#ffffff08}.alert-prod:last-child{border:none}
+.alert-prod-name{font-size:13px;color:var(--text-muted);min-width:100px}
+.alert-prod-counts{display:flex;gap:16px;flex:1}
+.alert-count{font-size:12px;font-family:'JetBrains Mono',monospace}
+.alert-live-bar{flex:1;max-width:120px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
+.alert-live-fill{height:100%;border-radius:2px;background:var(--green)}
+/* Risk */
+.risk-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.risk-item:last-child{border:none}
+.risk-sev{width:6px;min-height:32px;border-radius:3px;margin-top:2px;flex-shrink:0}
+.risk-content{flex:1}
+.risk-title{font-size:13px;font-weight:500;margin-bottom:3px}
+.risk-desc{font-size:11px;color:var(--text-dim);line-height:1.5}
+.risk-area{font-size:10px;color:var(--text-dim);margin-top:3px}
+/* Progress tracker */
+.tracker{display:flex;align-items:flex-end;gap:2px;height:100px;padding-top:12px}
+.tracker-bar{flex:1;border-radius:4px 4px 0 0;position:relative;min-width:0;transition:height .3s}
+.tracker-label{font-size:9px;color:var(--text-dim);text-align:center;margin-top:4px;letter-spacing:.5px}
+.tracker-val{font-size:10px;font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:4px;color:var(--text-muted)}
+.tracker-bench{position:absolute;left:0;right:0;border-top:2px dashed var(--gold);z-index:1}
+.tracker-bench-label{position:absolute;right:0;top:-16px;font-size:9px;color:var(--gold);font-family:'JetBrains Mono',monospace}
+.footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim)}
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;justify-content:center;align-items:center;padding:24px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:640px;width:100%;max-height:80vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:border-color .2s}
+.modal-close:hover{border-color:var(--teal);color:var(--teal)}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:4px}
+.modal .modal-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px}
+.modal table{width:100%;border-collapse:collapse;font-size:12px}
+.modal th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text-muted);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:1px}
+.modal td{padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text)}
+.modal tr:last-child td{border:none}
+.modal .m-bar{height:4px;background:var(--bg);border-radius:2px;min-width:60px}
+.modal .m-bar-fill{height:100%;border-radius:2px}
+.modal .m-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px}
+@media(max-width:1000px){.north-stars,.delivery-grid{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}}
+@media(max-width:600px){.north-stars,.delivery-grid,.two-col{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="dash">
+<div class="header"><div><h1>Product Operating System</h1><div class="header-sub">Delivery, investment, and platform health — at a glance</div></div><div class="header-meta"><div class="date">April 2026</div><div class="quarter">Q2 in progress · Q1 final</div></div></div>
+<div class="tabs">
+<div class="tab active" onclick="showTab(0)"><span class="tab-num">01</span>Delivery</div>
+<div class="tab" onclick="showTab(1)"><span class="tab-num">02</span>Investment & Trade-offs</div>
+<div class="tab" onclick="showTab(2)"><span class="tab-num">03</span>Platform Readiness</div>
+</div>
+
+<!-- TAB 1 -->
+<div class="tab-content active" id="tab0">
+<div class="north-stars">
+<div class="star" onclick="openModal('q1rate')"><div class="star-accent" style="background:var(--teal)"></div><div class="glow" style="background:var(--teal)"></div><div class="star-label">Q1 Delivery Rate</div><div class="star-value" style="color:var(--teal)">85.3%</div><div class="star-sub">3,772 of 4,421 story points accepted</div><div class="drill">Click for breakdown</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--green)"></div><div class="glow" style="background:var(--green)"></div><div class="star-label">Q1 Features Complete</div><div class="star-value" style="color:var(--green)">132<span style="font-size:18px;color:var(--text-dim)">/219</span></div><div class="star-sub">60% at 100% story completion</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--blue)"></div><div class="glow" style="background:var(--blue)"></div><div class="star-label">Q2 Committed</div><div class="star-value" style="color:var(--blue)">234</div><div class="star-sub">5,890 points · 127 devs across 6 product areas</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--gold)"></div><div class="glow" style="background:var(--gold)"></div><div class="star-label">Q2 In Progress</div><div class="star-value" style="color:var(--gold)">9</div><div class="star-sub">Early quarter — baseline established</div></div>
+</div>
+
+<!-- Q2 PROGRESS TRACKER -->
+<div class="section">
+<div class="section-title">Q2 delivery progress — monthly tracker</div>
+<div class="two-col">
+<div class="card card-s">
+<div class="chart-title">Story point acceptance through Q2</div>
+<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">Target: match or exceed Q1 benchmark of 85.3%. Updated monthly from Rally export.</div>
+<div style="position:relative;padding:0 8px">
+<div class="tracker-bench" style="bottom:85.3%;position:absolute;left:0;right:0;border-top:2px dashed var(--gold)"><span class="tracker-bench-label">Q1: 85.3%</span></div>
+<div style="display:flex;align-items:flex-end;height:120px;gap:16px;padding-top:20px">
+<div style="flex:1;text-align:center"><div class="tracker-val" style="color:var(--teal)">4%</div><div style="height:5px;background:var(--teal);border-radius:4px 4px 0 0"></div><div class="tracker-label">Apr</div></div>
+<div style="flex:1;text-align:center"><div class="tracker-val" style="color:var(--text-dim)">—</div><div style="height:1px;background:var(--border)"></div><div class="tracker-label">May</div></div>
+<div style="flex:1;text-align:center"><div class="tracker-val" style="color:var(--text-dim)">—</div><div style="height:1px;background:var(--border)"></div><div class="tracker-label">Jun</div></div>
+<div style="flex:1;text-align:center"><div class="tracker-val" style="color:var(--text-dim)">—</div><div style="height:1px;background:var(--border);border-radius:0"></div><div class="tracker-label">Final</div></div>
+</div>
+</div>
+<div style="font-size:10px;color:var(--text-dim);margin-top:12px">Expected trajectory: ~30% end of April · ~60% end of May · ~85% end of June</div>
+</div>
+<div class="card card-s">
+<div class="chart-title">Key risks this quarter</div>
+<div>
+<div class="risk-item"><div class="risk-sev" style="background:var(--coral)"></div><div class="risk-content"><div class="risk-title">Cyber Essentials scope unknown</div><div class="risk-desc">Gap analysis could require unplanned .NET upgrades across WFM UK and Architecture. May force mid-quarter replan.</div><div class="risk-area">WFM UK · Architecture</div></div></div>
+<div class="risk-item"><div class="risk-sev" style="background:var(--coral)"></div><div class="risk-content"><div class="risk-title">Tip Pooling resource constraint</div><div class="risk-desc">Key resource leaving the team. Capacity is tight for delivering V1 to GA as planned.</div><div class="risk-area">WFM US</div></div></div>
+<div class="risk-item"><div class="risk-sev" style="background:var(--gold)"></div><div class="risk-content"><div class="risk-title">Data Science availability for AI Shift Assignment</div><div class="risk-desc">50 points allocated to beta feedback may not be sufficient. Resource shared across auto-scheduling and predictive inventory.</div><div class="risk-area">WFM UK</div></div></div>
+<div class="risk-item"><div class="risk-sev" style="background:var(--gold)"></div><div class="risk-content"><div class="risk-title">MX > RME and Hierarchy estimates are high-level</div><div class="risk-desc">Sizes may change after refinement. Critical/show-stopper issues for key MX LC customers could derail current plan.</div><div class="risk-area">MacromatiX</div></div></div>
+<div class="risk-item"><div class="risk-sev" style="background:var(--gold)"></div><div class="risk-content"><div class="risk-title">HS Mobile UX change — third attempt</div><div class="risk-desc">Feedback could drive rework and delay modernisation timeline. Stronger beta process and business readiness planning in place as mitigation.</div><div class="risk-area">WFM US</div></div></div>
+<div class="risk-item"><div class="risk-sev" style="background:var(--blue)"></div><div class="risk-content"><div class="risk-title">Tim Hortons compliance requirements</div><div class="risk-desc">Unknown compliance requirements for Canadian market. Fiona investigating — could surface additional work.</div><div class="risk-area">WFM US · MacromatiX</div></div></div>
+</div>
+</div>
+</div></div>
+
+<div class="section">
+<div class="section-title">Q1 delivery by product area — click any card for Q2 detail</div>
+<div class="delivery-grid">
+<div class="card" onclick="openModal('area_wfmus')"><div class="area-header"><div class="area-name">WFM US <span style="font-size:11px;font-weight:400;color:var(--text-dim)">· 38 devs</span></div><div class="area-badge" style="background:var(--teal-dim);color:var(--teal)">81%</div></div><div class="area-stats"><div><div class="area-stat-label">Features</div><div class="area-stat-value">69</div></div><div><div class="area-stat-label">Done</div><div class="area-stat-value">35</div></div><div><div class="area-stat-label">Points</div><div class="area-stat-value" style="font-size:13px">1,137/1,410</div></div></div><div class="area-bar"><div class="area-bar-fill" style="width:81%;background:var(--teal)"></div></div><div class="area-focus"><span>Q2:</span> My Schedule Modernisation · LC Stabilisation · Tip Pooling GA · French Canadian</div><div class="drill">Click for Q2 detail</div></div>
+<div class="card" onclick="openModal('area_wfmuk')"><div class="area-header"><div class="area-name">WFM UK <span style="font-size:11px;font-weight:400;color:var(--text-dim)">· 28 devs (incl. HR, Payroll, FM)</span></div><div class="area-badge" style="background:var(--green-dim);color:var(--green)">89%</div></div><div class="area-stats"><div><div class="area-stat-label">Features</div><div class="area-stat-value">28</div></div><div><div class="area-stat-label">Done</div><div class="area-stat-value">11</div></div><div><div class="area-stat-label">Points</div><div class="area-stat-value" style="font-size:13px">517/582</div></div></div><div class="area-bar"><div class="area-bar-fill" style="width:89%;background:var(--green)"></div></div><div class="area-focus"><span>Q2:</span> Core gap closure · Forecast Manager GA · AI Shift Assignment pilot · Labour Demand</div><div class="drill">Click for Q2 detail</div></div>
+<div class="card" onclick="openModal('area_mx')"><div class="area-header"><div class="area-name">MacromatiX <span style="font-size:11px;font-weight:400;color:var(--text-dim)">· 28 devs</span></div><div class="area-badge" style="background:var(--gold-dim);color:var(--gold)">79%</div></div><div class="area-stats"><div><div class="area-stat-label">Features</div><div class="area-stat-value">27</div></div><div><div class="area-stat-label">Done</div><div class="area-stat-value">5</div></div><div><div class="area-stat-label">Points</div><div class="area-stat-value" style="font-size:13px">530/670</div></div></div><div class="area-bar"><div class="area-bar-fill" style="width:79%;background:var(--gold)"></div></div><div class="area-focus"><span>Q2:</span> LC Stabilisation · MX Connect Mobile (Tim Hortons) · MX→RME · POS gaps</div><div class="drill">Click for Q2 detail</div></div>
+<div class="card" onclick="openModal('area_hcmuk')"><div class="area-header"><div class="area-name">HCM UK <span style="font-size:11px;font-weight:400;color:var(--text-dim)">· within WFM UK 28</span></div><div class="area-badge" style="background:var(--green-dim);color:var(--green)">100%</div></div><div class="area-stats"><div><div class="area-stat-label">Features</div><div class="area-stat-value">22</div></div><div><div class="area-stat-label">Done</div><div class="area-stat-value">17</div></div><div><div class="area-stat-label">Points</div><div class="area-stat-value" style="font-size:13px">557/557</div></div></div><div class="area-bar"><div class="area-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="area-focus"><span>Q2:</span> Absence in Hours · PBIK · Employment Rights Act · Company Sick Pay</div><div class="drill">Click for Q2 detail</div></div>
+<div class="card" onclick="openModal('area_hcmus')"><div class="area-header"><div class="area-name">HCM US <span style="font-size:11px;font-weight:400;color:var(--text-dim)">· 5 devs</span></div><div class="area-badge" style="background:var(--green-dim);color:var(--green)">100%</div></div><div class="area-stats"><div><div class="area-stat-label">Features</div><div class="area-stat-value">7</div></div><div><div class="area-stat-label">Done</div><div class="area-stat-value">7</div></div><div><div class="area-stat-label">Points</div><div class="area-stat-value" style="font-size:13px">71/71</div></div></div><div class="area-bar"><div class="area-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="area-focus"><span>Q2:</span> iQ Actions for Managers · Multi-FEIN Re-hires · ATS Compliance</div><div class="drill">Click for Q2 detail</div></div>
+<div class="card" onclick="openModal('area_platform')"><div class="area-header"><div class="area-name">Platform & Data <span style="font-size:11px;font-weight:400;color:var(--text-dim)">· 28 devs</span></div><div class="area-badge" style="background:var(--teal-dim);color:var(--teal)">85%</div></div><div class="area-stats"><div><div class="area-stat-label">Features</div><div class="area-stat-value">66</div></div><div><div class="area-stat-label">Done</div><div class="area-stat-value">32</div></div><div><div class="area-stat-label">Points</div><div class="area-stat-value" style="font-size:13px">959/1,131</div></div></div><div class="area-bar"><div class="area-bar-fill" style="width:85%;background:var(--teal)"></div></div><div class="area-focus"><span>Q2:</span> AI Forecasting · iQ App v2 · Fourth 360 · Central Hierarchy · MFA</div><div class="drill">Click for Q2 detail</div></div>
+</div></div></div>
+
+<!-- TAB 2 -->
+<div class="tab-content" id="tab1">
+<div class="north-stars">
+<div class="star" onclick="openModal('rd_detail')"><div class="star-accent" style="background:var(--teal)"></div><div class="glow" style="background:var(--teal)"></div><div class="star-label">Q2 R&D Investment</div><div class="star-value" style="color:var(--teal)">77%</div><div class="star-sub">4,530 of 5,890 points on strategic R&D</div><div class="drill">Click for per-area split</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--gold)"></div><div class="glow" style="background:var(--gold)"></div><div class="star-label">Q2 Trade Decisions</div><div class="star-value" style="color:var(--gold)">30</div><div class="star-sub">16 traded in · 14 traded out</div></div>
+<div class="star" onclick="openModal('elt_decisions')"><div class="star-accent" style="background:var(--coral)"></div><div class="glow" style="background:var(--coral)"></div><div class="star-label">ELT Decisions Required</div><div class="star-value" style="color:var(--coral)">7</div><div class="star-sub">Trade-offs needing explicit sign-off</div><div class="drill">Click for details</div></div>
+<div class="star" onclick="openModal('atrisk_all')"><div class="star-accent" style="background:var(--coral)"></div><div class="glow" style="background:var(--coral)"></div><div class="star-label">At-Risk ARR</div><div class="star-value" style="color:var(--coral)">£1.85M</div><div class="star-sub">5 named accounts + ~$150K APAC</div><div class="drill">Click for account detail</div></div>
+</div>
+<div class="two-col" style="margin-bottom:28px">
+<div class="card card-s"><div class="chart-title">Q2 investment by category</div><div style="position:relative;height:220px"><canvas id="catChart"></canvas></div><div id="catLegend" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;font-size:11px;color:var(--text-muted)"></div></div>
+<div class="card card-s"><div class="chart-title">Strategic R&D — Q1 vs Q2 shift</div><div style="position:relative;height:220px"><canvas id="rdChart"></canvas></div><div style="margin-top:8px;font-size:11px;color:var(--text-dim)">MacromatiX +30pp · HCM US +24pp · WFM UK −10pp (intentional pivot to gap closure)</div></div>
+</div>
+<div class="two-col" style="margin-bottom:28px">
+<div class="card card-s"><div class="chart-title">Q2 trade-off themes</div><ul class="theme-list">
+<li><strong>Foundation over innovation</strong> — AI Auto Scheduling deferred in WFM US and LC GTM. iQ Alerts deferred in WFM UK. CAB feedback: fix existing functionality first.</li>
+<li><strong>Large Chain is the priority</strong> — LC Stabilisation, MX→RME, Tim Hortons, Central Hierarchy all traded in. Dominant theme across three product areas.</li>
+<li><strong>Tech debt deferred</strong> — AWS→Azure (MX), .NET/Cyber Essentials (WFM UK), Prism migration (US) all traded out. Cyber Essentials may force mid-Q replan.</li>
+<li><strong>Employee App deprioritised</strong> — Combined Employee App and ESS/MySchedule refresh both traded out of WFM UK.</li>
+<li><strong>Platform enabling product</strong> — Central Hierarchy, Forecast Explanations, Email MFA traded in to unblock product teams.</li>
+</ul></div>
+<div class="card card-s"><div class="chart-title">Churn — product attribution (click any account)</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim)">EMEA FY26</div><div style="font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--coral)">£7.5M</div></div>
+<div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim)">US FY26</div><div style="font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--coral)">$9.5M</div></div>
+</div>
+<div>
+<div class="churn-tag" style="background:var(--coral-dim);border-color:#FF6B6B50;color:var(--coral)" onclick="openModal('churn_pe')">Pizza Express £1M</div>
+<div class="churn-tag" style="background:var(--gold-dim);border-color:#F4C43050;color:var(--gold)" onclick="openModal('churn_prezzo')">Prezzo £300K</div>
+<div class="churn-tag" style="background:var(--coral-dim);border-color:#FF6B6B50;color:var(--coral)" onclick="openModal('churn_redcat')">RedCat £160K</div>
+<div class="churn-tag" style="background:var(--coral-dim);border-color:#FF6B6B50;color:var(--coral)" onclick="openModal('churn_hick')">Hickories £195K</div>
+<div class="churn-tag" style="background:var(--gold-dim);border-color:#F4C43050;color:var(--gold)" onclick="openModal('churn_san')">San Churro ~$150K</div>
+</div></div></div></div>
+
+<!-- TAB 3 -->
+<div class="tab-content" id="tab2">
+<div class="north-stars">
+<div class="star star-na"><div class="star-accent" style="background:var(--green)"></div><div class="glow" style="background:var(--green)"></div><div class="star-label">Alerts & Actions Live</div><div class="star-value" style="color:var(--green)">89<span style="font-size:18px;color:var(--text-dim)">/92</span></div><div class="star-sub">97% deployed across all products</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--teal)"></div><div class="glow" style="background:var(--teal)"></div><div class="star-label">iQ360 Overall</div><div class="star-value" style="color:var(--teal)">38%</div><div class="star-sub">372 of 980 events instrumented</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--green)"></div><div class="glow" style="background:var(--green)"></div><div class="star-label">Products Ready (>70%)</div><div class="star-value" style="color:var(--green)">4</div><div class="star-sub">Forecast Mgr · HR UK · WFM UK · P2P</div></div>
+<div class="star star-na"><div class="star-accent" style="background:var(--coral)"></div><div class="glow" style="background:var(--coral)"></div><div class="star-label">Products at 0%</div><div class="star-value" style="color:var(--coral)">5</div><div class="star-sub">EWA · Tip Payout · Payroll US · Log Book · Mobile P2P</div></div>
+</div>
+<div class="two-col" style="margin-bottom:28px">
+<div class="card card-s">
+<div class="chart-title">iQ360 instrumentation — click any product for capability breakdown</div>
+<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">How much of each product can the intelligence layer see?</div>
+<div class="intel-row-item" onclick="openModal('iq_wfmuk')"><span class="intel-label">WFM UK</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:72%;background:var(--teal)"></div></div><span class="intel-pct" style="color:var(--teal)">72%</span><span class="intel-status" style="color:var(--teal)">51/71</span></div>
+<div class="intel-row-item" onclick="openModal('iq_wfmus')"><span class="intel-label">WFM US</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:54%;background:var(--gold)"></div></div><span class="intel-pct" style="color:var(--gold)">54%</span><span class="intel-status" style="color:var(--gold)">63/117</span></div>
+<div class="intel-row-item" onclick="openModal('iq_mx')"><span class="intel-label">MacromatiX</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:22%;background:var(--coral)"></div></div><span class="intel-pct" style="color:var(--coral)">22%</span><span class="intel-status" style="color:var(--text-dim)">24/111</span></div>
+<div class="intel-row-item" onclick="openModal('iq_hruk')"><span class="intel-label">HR UK</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:91%;background:var(--green)"></div></div><span class="intel-pct" style="color:var(--green)">91%</span><span class="intel-status" style="color:var(--green)">53/58</span></div>
+<div class="intel-row-item"><span class="intel-label">HR US</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:31%;background:var(--gold)"></div></div><span class="intel-pct" style="color:var(--gold)">31%</span><span class="intel-status" style="color:var(--text-dim)">17/54</span></div>
+<div class="intel-row-item"><span class="intel-label">Forecast Manager</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:100%;background:var(--green)"></div></div><span class="intel-pct" style="color:var(--green)">100%</span><span class="intel-status" style="color:var(--green)">12/12</span></div>
+<div class="intel-row-item"><span class="intel-label">P2P / Adaco / RME</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:37%;background:var(--gold)"></div></div><span class="intel-pct" style="color:var(--gold)">37%</span><span class="intel-status" style="color:var(--text-dim)">104/280</span></div>
+<div class="intel-row-item"><span class="intel-label">EWA · Tip Payout · Payroll US</span><div class="intel-bar-wrap"><div class="intel-bar" style="width:0%"></div></div><span class="intel-pct" style="color:var(--text-dim)">0%</span><span class="intel-status" style="color:var(--coral)">0/113</span></div>
+</div>
+<div>
+<div class="card card-s" style="margin-bottom:16px">
+<div class="chart-title">Alerts & actions — click any product for detail</div>
+<div style="font-size:11px;color:var(--text-dim);margin-bottom:12px">Live = release 2.4 or earlier</div>
+<div class="alert-prod" onclick="openModal('alerts_hcmus')"><span class="alert-prod-name">HCM US</span><div class="alert-prod-counts"><span class="alert-count" style="color:var(--green)">20 live</span></div><div class="alert-live-bar"><div class="alert-live-fill" style="width:100%"></div></div></div>
+<div class="alert-prod" onclick="openModal('alerts_mx')"><span class="alert-prod-name">MacromatiX</span><div class="alert-prod-counts"><span class="alert-count" style="color:var(--green)">18 live</span></div><div class="alert-live-bar"><div class="alert-live-fill" style="width:100%"></div></div></div>
+<div class="alert-prod" onclick="openModal('alerts_wfmuk')"><span class="alert-prod-name">WFM UK</span><div class="alert-prod-counts"><span class="alert-count" style="color:var(--green)">17 live</span><span class="alert-count" style="color:var(--gold)">2 planned</span></div><div class="alert-live-bar"><div class="alert-live-fill" style="width:89%"></div></div></div>
+<div class="alert-prod" onclick="openModal('alerts_hcmuk')"><span class="alert-prod-name">HCM UK</span><div class="alert-prod-counts"><span class="alert-count" style="color:var(--green)">15 live</span></div><div class="alert-live-bar"><div class="alert-live-fill" style="width:100%"></div></div></div>
+<div class="alert-prod" onclick="openModal('alerts_wfmus')"><span class="alert-prod-name">WFM US</span><div class="alert-prod-counts"><span class="alert-count" style="color:var(--green)">12 live</span><span class="alert-count" style="color:var(--gold)">1 planned</span></div><div class="alert-live-bar"><div class="alert-live-fill" style="width:92%"></div></div></div>
+<div class="alert-prod" onclick="openModal('alerts_invuk')"><span class="alert-prod-name">Inventory UK</span><div class="alert-prod-counts"><span class="alert-count" style="color:var(--green)">7 live</span></div><div class="alert-live-bar"><div class="alert-live-fill" style="width:100%"></div></div></div>
+</div>
+<div class="card card-s"><div class="chart-title">What this means</div><div style="font-size:12px;color:var(--text-muted);line-height:1.7">
+<p style="margin-bottom:10px"><strong style="color:var(--green)">Alerts & actions nearly complete</strong> — 89 of 92 deployed. The iQ action layer is live across all product areas.</p>
+<p style="margin-bottom:10px"><strong style="color:var(--gold)">Instrumentation is uneven</strong> — UK products well-instrumented. US and Inventory behind — iQ is partially blind.</p>
+<p><strong style="color:var(--coral)">Five products at zero</strong> — no adoption data, efficiency scores, or alerts possible until instrumentation begins.</p>
+</div></div></div></div></div>
+
+<div class="footer"><div>Source: Rally Q1/Q2 · iQ360 · ELT Trade-Off Deck · Alerts Catalogue</div><div>Product Operating System · April 2026</div></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+<div class="modal"><button class="modal-close" onclick="closeModal()">✕</button><div id="modalContent"></div></div>
+</div>
+
+<script>
+const D={
+atrisk_all:{t:'At-risk accounts — full detail',s:'£1.85M EMEA + ~$150K APAC · 5 named accounts',custom:true},
+area_wfmus:{t:'WFM US — Q2 focus areas',s:'81 features · 2,060 points · 38 devs across 7 teams',rows:[{n:'My Schedule Modernization',f:5,p:330,pct:16},{n:'LC Stabilisation (Solution Architecture)',f:4,p:160,pct:8},{n:'Web and Mobile Color Refresh',f:5,p:150,pct:7},{n:'Defect Resolution (Labor Main)',f:9,p:140,pct:7},{n:'Reporting Scalability',f:4,p:90,pct:4}]},
+area_wfmuk:{t:'WFM UK — Q2 focus areas',s:'26 features · 460 points · part of 28 devs (shared with HCM UK)',rows:[{n:'R&D Enhancements (core gap closure)',f:7,p:140,pct:30},{n:'Forecast Manager — Centralised UI',f:7,p:100,pct:22},{n:'EMEA Maintenance',f:4,p:80,pct:17},{n:'Labour Demand Drivers',f:2,p:50,pct:11},{n:'AI Auto Scheduling (pilot feedback)',f:1,p:30,pct:7}]},
+area_mx:{t:'MacromatiX — Q2 focus areas',s:'30 features · 990 points · 28 devs across 4 teams',rows:[{n:'LC Stabilisation (Solution Architecture)',f:4,p:230,pct:23},{n:'MX Connect Migration (React/Mobile)',f:8,p:220,pct:22},{n:'QSR Maintenance & Defects',f:4,p:100,pct:10},{n:'POS Integrations (Simphony/Brink)',f:3,p:50,pct:5},{n:'MX Analytics Enhancements',f:1,p:30,pct:3}]},
+area_hcmuk:{t:'HCM UK — Q2 focus areas',s:'25 features · 590 points · part of 28 devs (shared with WFM UK)',rows:[{n:'EMEA Maintenance & Defects',f:7,p:130,pct:22},{n:'Employment Rights Act UK',f:2,p:100,pct:17},{n:'Absence in Hours / Part Day Absences',f:2,p:100,pct:17},{n:'PBIK (Payrolling Benefits in Kind)',f:6,p:90,pct:15},{n:'R&D Enhancements',f:4,p:60,pct:10}]},
+area_hcmus:{t:'HCM US — Q2 focus areas',s:'9 features · 220 points · 5 devs (Spaceguettis)',rows:[{n:'iQ Actions & Notifications for Managers',f:2,p:60,pct:27},{n:'Re-hires/Transfers for Multi-FEIN',f:2,p:50,pct:23},{n:'ATS Compliance & Legislation',f:1,p:20,pct:9},{n:'HR & Payroll Integration',f:1,p:20,pct:9},{n:'Payroll Feed Service',f:1,p:10,pct:5}]},
+area_platform:{t:'Platform & Data — Q2 focus areas',s:'63 features · 1,570 points · 28 devs across 7 teams',rows:[{n:'AI Forecasting Enhancements',f:6,p:180,pct:11},{n:'Platform R&D Enhancements',f:8,p:150,pct:10},{n:'Fourth 360 (Data Science & Engineering)',f:2,p:130,pct:8},{n:'Platform Technology',f:7,p:130,pct:8},{n:'iQ App v2',f:2,p:80,pct:5}]},
+q1rate:{t:'Q1 delivery rate — breakdown by product area',s:'219 features · 3,772 of 4,421 points accepted · 85.3% overall',rows:[{n:'WFM US',f:69,p:1137,pl:1410,r:'81%'},{n:'WFM UK',f:28,p:517,pl:582,r:'89%'},{n:'MacromatiX',f:27,p:530,pl:669,r:'79%'},{n:'HCM UK',f:22,p:557,pl:557,r:'100%'},{n:'HCM US',f:7,p:71,pl:71,r:'100%'},{n:'Platform & Data',f:65,p:959,pl:1131,r:'85%'}]},
+rd_detail:{t:'Q2 R&D investment — per area split',s:'Overall 77% on R&D · Q1→Q2 shift shown',rows:[{n:'WFM US',rd:77,ma:8,te:13,d:'+0pp'},{n:'WFM UK',rd:76,ma:17,te:7,d:'-10pp R&D (intentional gap closure)'},{n:'MacromatiX',rd:72,ma:17,te:1,d:'+30pp R&D (major positive shift)'},{n:'HCM UK',rd:80,ma:20,te:0,d:'Flat'},{n:'HCM US',rd:77,ma:23,te:0,d:'+24pp R&D (rebalanced from maintenance)'},{n:'Platform & Data',rd:79,ma:11,te:8,d:'Stable'}]},
+elt_decisions:{t:'ELT decisions required — Q2 trade-offs',s:'7 trade-offs needing explicit sign-off',rows:[{a:'WFM US',n:'AI Auto Scheduling deferred',w:'Communicated at CAB as active. Need to confirm revised timeline and messaging impact.'},{a:'MacromatiX',n:'AWS to Azure Migration deferred',w:'Confirm deferral to Q3+ to prioritise LC stabilisation.'},{a:'MacromatiX',n:'Simphony POS Historical Sales deferred',w:'Deferred alongside Azure migration. Confirm both items.'},{a:'WFM UK',n:'iQ Alerts & Actions deferred',w:'Customers unlikely to adopt until core gaps closed. Slower intelligence narrative.'},{a:'WFM UK',n:'Cyber Essentials .NET upgrade',w:'May force mid-quarter replan if mandated. Monitoring.'},{a:'Platform',n:'Central Events & Promotions for AI Forecasting',w:'Data Science focus decision: this vs auto-scheduling for WFM US iQ.'},{a:'LC GTM',n:'AI Auto Scheduling (US) removed',w:'Removed based on direct CAB feedback. Timeline communicated at CAB needs updating.'}]},
+churn_pe:{t:'Pizza Express',s:'£1M ARR at risk',d:[['Region','EMEA'],['Primary reason','Feature gap — AI Shift Assignment'],['Status','Pilot in progress'],['Action','Deliver AI Shift Assignment pilot feedback fixes in Q2'],['Owner','WFM UK']]},
+churn_prezzo:{t:'Prezzo',s:'£300K ARR at risk',d:[['Region','EMEA'],['Primary reason','Adoption failure — implementing new brand on Fourth'],['Status','Engaged with Productivity team'],['Action','Support brand implementation on Fourth platform'],['Owner','WFM UK']]},
+churn_redcat:{t:'RedCat / Coaching Inn',s:'£160K ARR at risk',d:[['Region','EMEA'],['Primary reason','Competitor capability'],['Status','Notice given'],['Action','Solution consulting review and recontract proposal issued'],['Owner','CS EMEA']]},
+churn_hick:{t:'Hickories',s:'£195K ARR at risk',d:[['Region','EMEA'],['Primary reason','Competitor — Stint'],['Status','Notice given'],['Action','Meeting set with FD — limited product lever'],['Owner','CS EMEA']]},
+churn_san:{t:'San Churro',s:'~$150K ARR at risk',d:[['Region','APAC'],['Primary reason','Adoption failure — 60 locations'],['Status','Failed adoption'],['Action','Post-mortem needed — product readiness or implementation?'],['Owner','APAC GTM']]},
+iq_wfmuk:{t:'WFM UK — iQ360 capability breakdown',s:'51 of 71 events completed (72%)',rows:[{n:'Auto-scheduling',c:2,d:2,s:'Complete'},{n:'Forecasting',c:4,d:4,s:'Complete'},{n:'Productivity iQ',c:5,d:5,s:'Complete'},{n:'Reporting',c:5,d:5,s:'Complete'},{n:'Labour Optimisation',c:11,d:9,s:'In Progress'},{n:'Scheduling',c:25,d:24,s:'In Progress'},{n:'Time & Attendance',c:6,d:2,s:'In Progress'},{n:'Activity-based Scheduling',c:8,d:0,s:'Not Started'},{n:'Recommendations',c:3,d:0,s:'Not Started'},{n:'Scenario Modelling',c:2,d:0,s:'Not Started'}]},
+iq_wfmus:{t:'WFM US — iQ360 capability breakdown',s:'63 of 117 events completed (54%)',rows:[{n:'Advanced Labor Analytics',c:1,d:1,s:'Complete'},{n:'Forecasting',c:4,d:4,s:'Complete'},{n:'Labor Reporting',c:2,d:2,s:'Complete'},{n:'Scheduling Templates',c:2,d:2,s:'Complete'},{n:'AI Sales Forecasting',c:1,d:1,s:'Complete'},{n:'Compliance',c:23,d:14,s:'In Progress'},{n:'Employee Scheduling',c:30,d:21,s:'In Progress'},{n:'Team Communication',c:10,d:7,s:'In Progress'},{n:'Manager Logbook',c:5,d:4,s:'In Progress'},{n:'AI Shift Assignment',c:3,d:1,s:'In Progress'},{n:'Time & Attendance',c:8,d:1,s:'In Progress'},{n:'AI Labor Rules',c:2,d:0,s:'Not Started'},{n:'Tip Management',c:4,d:0,s:'Not Started'}]},
+iq_mx:{t:'MacromatiX — iQ360 capability breakdown',s:'24 of 111 events completed (22%)',rows:[{n:'Inventory Control',c:25,d:10,s:'In Progress'},{n:'Receiving & Invoicing',c:10,d:5,s:'In Progress'},{n:'Purchasing',c:8,d:3,s:'In Progress'},{n:'Analytics & Reporting',c:12,d:0,s:'Not Started'},{n:'Forecasting',c:17,d:0,s:'Not Started'},{n:'Recipe & Menu Engineering',c:7,d:0,s:'Not Started'},{n:'Replenishment',c:4,d:0,s:'Not Started'},{n:'Preparation Planning',c:3,d:0,s:'Not Started'},{n:'Cash Management',c:10,d:0,s:'Not Started'}]},
+iq_hruk:{t:'HR UK — iQ360 capability breakdown',s:'53 of 58 events completed (91%)',rows:[{n:'Compliance',c:7,d:7,s:'Complete'},{n:'Holidays & Absences',c:9,d:9,s:'Complete'},{n:'Onboarding',c:5,d:5,s:'Complete'},{n:'Pay & Grading',c:6,d:6,s:'Complete'},{n:'Self-service',c:5,d:5,s:'Complete'},{n:'Employee Records',c:22,d:18,s:'In Progress'}]},
+alerts_wfmuk:{t:'WFM UK — alerts & actions',s:'17 live · 2 planned (r2.5+)',rows:[{n:'Forecast Adjustments & Open Shift Creation',ty:'Action',u:'In Store',l:true},{n:'Schedule Approvals',ty:'Action',u:'In Store',l:true},{n:'Prior Day Labor & Sales Performance',ty:'Alert',u:'In Store',l:true},{n:'WTD Labor & Sales Performance',ty:'Alert',u:'In Store',l:true},{n:'Missing Clock Alert',ty:'Alert',u:'In Store',l:true},{n:'Schedule Status Alerts',ty:'Alert',u:'Above Store',l:true},{n:'Top/Bottom Performance — WTD',ty:'Alert',u:'Above Store',l:true},{n:'Top/Bottom Performance — Prior Day',ty:'Alert',u:'Above Store',l:true},{n:'Swap/Give Shift Actions',ty:'Action',u:'In Store',l:true},{n:'Drop Shift Action',ty:'Action',u:'In Store',l:true},{n:'Unavailability Approvals',ty:'Action',u:'In Store',l:true},{n:'Schedule Deadlines',ty:'Action',u:'In Store',l:true},{n:'Forecast Adjustment Decrease',ty:'Alert',u:'In Store',l:true},{n:'Publish Schedule Reminder',ty:'Action',u:'In Store',l:true},{n:'Busy Periods Sales',ty:'Alert',u:'In Store',l:true},{n:'Assign Employee Skill',ty:'Action',u:'In Store',l:true},{n:'Labour Impact Metrics',ty:'Alert',u:'In Store',l:true},{n:'Forecast Adjustments (no Auto Sched)',ty:'Alert',u:'In Store',l:false},{n:'Absence Cover',ty:'Action',u:'In Store',l:false}]},
+alerts_wfmus:{t:'WFM US — alerts & actions',s:'12 live · 1 planned (r2.6)',rows:[{n:'Prior Day Labor & Sales',ty:'Alert',u:'In Store',l:true},{n:'WTD Labor & Sales',ty:'Alert',u:'In Store',l:true},{n:'Expiring Certificates',ty:'Action',u:'In Store',l:true},{n:'Approaching Overtime',ty:'Action',u:'In Store',l:true},{n:'Minor Employee Breach',ty:'Alert',u:'In Store',l:true},{n:'Schedule Optimizer Score',ty:'Alert',u:'In Store',l:true},{n:'Top/Bottom — Prior Day',ty:'Alert',u:'Above Store',l:true},{n:'Top/Bottom — WTD',ty:'Alert',u:'Above Store',l:true},{n:'Expiring Certificates v2',ty:'Action',u:'In Store',l:true},{n:'Approaching Overtime v2',ty:'Action',u:'In Store',l:true},{n:'Increased Forecast Adjustment',ty:'Action',u:'In Store',l:true},{n:'Reduced Forecast Adjustment',ty:'Alert',u:'In Store',l:true},{n:'Schedule Post Reminder',ty:'Alert',u:'In Store',l:false}]},
+alerts_hcmuk:{t:'HCM UK — alerts & actions',s:'15 live · 0 planned',rows:[{n:'Holiday Approval/Decline',ty:'Action',u:'In Store',l:true},{n:'Holiday Cancellation',ty:'Alert',u:'In Store',l:true},{n:'Missing Right to Work',ty:'Alert',u:'In Store',l:true},{n:'Expired Right to Work',ty:'Alert',u:'In Store',l:true},{n:'Probation Ending',ty:'Alert',u:'In Store',l:true},{n:'Rota Submission Overdue',ty:'Alert',u:'In Store',l:true},{n:'New Starters — First Shift',ty:'Alert',u:'In Store',l:true},{n:'Leavers — Last Shift',ty:'Alert',u:'In Store',l:true},{n:'Employee Birthday',ty:'Alert',u:'In Store',l:true},{n:'Employee Anniversary',ty:'Alert',u:'In Store',l:true},{n:'Employment Change Request',ty:'Alert',u:'In Store',l:true},{n:'Fixed Term Contract Ending',ty:'Alert',u:'In Store',l:true},{n:'Candidate Onboarding Incomplete',ty:'Alert',u:'In Store',l:true},{n:'New Employee Onboarding Complete',ty:'Action',u:'In Store',l:true},{n:'Trust ID Response Received',ty:'Alert',u:'In Store',l:true}]},
+alerts_hcmus:{t:'HCM US — alerts & actions',s:'20 live · 0 planned',rows:[{n:'I-9 Section 1',ty:'Action',u:'In Store',l:true},{n:'I-9 Section 2',ty:'Action',u:'In Store',l:true},{n:'E-Verify',ty:'Action',u:'In Store',l:true},{n:'Excessive Turnover',ty:'Alert',u:'In Store',l:true},{n:'Interviews Today',ty:'Alert',u:'In Store',l:true},{n:'Background Check',ty:'Action',u:'In Store',l:true},{n:'Time to View Application',ty:'Alert',u:'In Store',l:true},{n:'Birthday',ty:'Alert',u:'In Store',l:true},{n:'Anniversary',ty:'Alert',u:'In Store',l:true},{n:'Top Overdue I-9s',ty:'Alert',u:'Above Store',l:true},{n:'Top/Bottom Turnover',ty:'Alert',u:'Above Store',l:true},{n:'Top/Bottom Time to View',ty:'Alert',u:'Above Store',l:true},{n:'Background Check (mobile)',ty:'Action',u:'In Store',l:true},{n:'E-Verify Scan & Upload',ty:'Action',u:'In Store',l:true},{n:'E-Verify Close & Resubmit',ty:'Action',u:'In Store',l:true},{n:'I-9 (mobile)',ty:'Action',u:'In Store',l:true},{n:'New Hire Retention',ty:'Alert',u:'In Store',l:true},{n:'Application Sources',ty:'Alert',u:'In Store',l:true},{n:'Unreviewed Applications',ty:'Alert',u:'In Store',l:true},{n:'Background Check Alert',ty:'Alert',u:'In Store',l:true}]},
+alerts_mx:{t:'MacromatiX — alerts & actions',s:'18 live · 0 planned',rows:[{n:'Allergen Changes',ty:'Action',u:'In Store',l:true},{n:'Unrecognized PLU',ty:'Alert',u:'In Store',l:true},{n:'Wastage vs Revenue',ty:'Alert',u:'In Store',l:true},{n:'Negative Stock',ty:'Alert',u:'In Store',l:true},{n:'Item Availability',ty:'Alert',u:'In Store',l:true},{n:'Pending Deliveries',ty:'Action',u:'In Store',l:true},{n:'GR Discrepancy',ty:'Alert',u:'In Store',l:true},{n:'Credit Note Required',ty:'Action',u:'In Store',l:true},{n:'Order Confirmation',ty:'Alert',u:'In Store',l:true},{n:'Variance Results',ty:'Action',u:'Above Store',l:true}]},
+alerts_invuk:{t:'Inventory UK — alerts & actions',s:'7 live · 0 planned',rows:[{n:'Allergen Changes',ty:'Action',u:'In Store',l:true},{n:'Unrecognized PLU',ty:'Alert',u:'In Store',l:true},{n:'Wastage vs Revenue',ty:'Alert',u:'In Store',l:true},{n:'Negative Stock',ty:'Alert',u:'In Store',l:true},{n:'Item Availability',ty:'Alert',u:'In Store',l:true},{n:'Pending Deliveries',ty:'Action',u:'In Store',l:true},{n:'Inventory Variance Results',ty:'Action',u:'Above Store',l:true}]}
+};
+function openModal(k){const d=D[k];if(!d)return;let h=`<h3>${d.t}</h3><div class="modal-sub">${d.s}</div>`;
+if(d.custom){h+=`<table><tr><th>Account</th><th>ARR</th><th>Region</th><th>Reason</th><th>Status</th></tr>
+<tr><td style="font-weight:500">Pizza Express</td><td style="font-family:'JetBrains Mono',monospace;color:var(--coral)">£1.0M</td><td>EMEA</td><td>Feature gap — AI Shift Assignment</td><td><span class="m-tag" style="background:var(--gold-dim);color:var(--gold)">Pilot in progress</span></td></tr>
+<tr><td style="font-weight:500">Prezzo</td><td style="font-family:'JetBrains Mono',monospace;color:var(--coral)">£300K</td><td>EMEA</td><td>Adoption failure — new brand implementation</td><td><span class="m-tag" style="background:var(--gold-dim);color:var(--gold)">Engaged</span></td></tr>
+<tr><td style="font-weight:500">Hickories</td><td style="font-family:'JetBrains Mono',monospace;color:var(--coral)">£195K</td><td>EMEA</td><td>Competitor — Stint</td><td><span class="m-tag" style="background:var(--coral-dim);color:var(--coral)">Notice given</span></td></tr>
+<tr><td style="font-weight:500">RedCat / Coaching Inn</td><td style="font-family:'JetBrains Mono',monospace;color:var(--coral)">£160K</td><td>EMEA</td><td>Competitor capability</td><td><span class="m-tag" style="background:var(--coral-dim);color:var(--coral)">Notice given</span></td></tr>
+<tr><td style="font-weight:500">San Churro</td><td style="font-family:'JetBrains Mono',monospace;color:var(--coral)">~$150K</td><td>APAC</td><td>Adoption failure — 60 locations</td><td><span class="m-tag" style="background:var(--coral-dim);color:var(--coral)">Failed</span></td></tr></table>
+<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+<div style="font-size:12px;font-weight:500;margin-bottom:8px">Product actions in play:</div>
+<div style="font-size:11px;color:var(--text-muted);line-height:1.7">
+<strong style="color:var(--text)">Pizza Express</strong> — AI Shift Assignment pilot feedback fixes being delivered in Q2. Owned by WFM UK.<br>
+<strong style="color:var(--text)">Prezzo</strong> — Supporting brand implementation on Fourth platform. Engaged with Productivity team.<br>
+<strong style="color:var(--text)">Hickories</strong> — Meeting set with FD. Limited product lever — this is a competitor loss.<br>
+<strong style="color:var(--text)">RedCat</strong> — Solution consulting review and recontract proposal issued.<br>
+<strong style="color:var(--text)">San Churro</strong> — Post-mortem needed. Was this product readiness or implementation failure?
+</div></div>`;} else if(d.d){h+='<table>';d.d.forEach(r=>h+=`<tr><td style="color:var(--text-muted);width:120px">${r[0]}</td><td>${r[1]}</td></tr>`);h+='</table>';}
+else if(d.rows[0]?.pct!==undefined){h+='<table><tr><th>Initiative</th><th>Features</th><th>Points</th><th>% of area</th><th></th></tr>';d.rows.forEach(r=>{h+=`<tr><td>${r.n}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.f}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.p}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.pct}%</td><td style="width:80px"><div class="m-bar"><div class="m-bar-fill" style="width:${r.pct}%;background:var(--teal)"></div></div></td></tr>`;});h+='</table>';}
+else if(d.rows[0]?.r!==undefined){h+='<table><tr><th>Area</th><th>Features</th><th>Accepted</th><th>Planned</th><th>Rate</th><th></th></tr>';d.rows.forEach(r=>{const c=parseInt(r.r)>=85?'var(--green)':parseInt(r.r)>=80?'var(--teal)':'var(--gold)';h+=`<tr><td>${r.n}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.f}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.p.toLocaleString()}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.pl.toLocaleString()}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center;color:${c}">${r.r}</td><td style="width:80px"><div class="m-bar"><div class="m-bar-fill" style="width:${r.r};background:${c}"></div></div></td></tr>`;});h+='</table>';}
+else if(d.rows[0]?.rd!==undefined){h+='<table><tr><th>Area</th><th>R&D</th><th>Maint.</th><th>Tech</th><th>Q1→Q2</th></tr>';d.rows.forEach(r=>{h+=`<tr><td>${r.n}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center;color:var(--teal)">${r.rd}%</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.ma}%</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.te}%</td><td style="font-size:11px;color:var(--text-dim)">${r.d}</td></tr>`;});h+='</table>';}
+else if(d.rows[0]?.w!==undefined){h+='<table><tr><th>Area</th><th>Decision</th><th>Impact</th></tr>';d.rows.forEach(r=>{h+=`<tr><td style="white-space:nowrap;color:var(--teal)">${r.a}</td><td style="font-weight:500">${r.n}</td><td style="font-size:11px;color:var(--text-dim)">${r.w}</td></tr>`;});h+='</table>';}
+else if(d.rows[0]?.c!==undefined){h+='<table><tr><th>Capability</th><th>Events</th><th>Done</th><th>%</th><th>Status</th></tr>';d.rows.forEach(r=>{const p=r.c>0?Math.round(r.d/r.c*100):0;const sc=r.s==='Complete'?'var(--green)':r.s==='In Progress'?'var(--gold)':'var(--coral)';h+=`<tr><td>${r.n}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.c}</td><td style="font-family:\'JetBrains Mono\',monospace;text-align:center">${r.d}</td><td style="width:80px"><div class="m-bar"><div class="m-bar-fill" style="width:${p}%;background:${sc}"></div></div></td><td><span class="m-tag" style="background:${sc}20;color:${sc}">${r.s}</span></td></tr>`;});h+='</table>';}
+else if(d.rows[0]?.ty!==undefined){h+='<table><tr><th>Name</th><th>Type</th><th>User</th><th>Status</th></tr>';d.rows.forEach(r=>{const tc=r.ty==='Action'?'var(--teal)':'var(--blue)';const lc=r.l?'var(--green)':'var(--gold)';h+=`<tr><td>${r.n}</td><td><span class="m-tag" style="background:${tc}20;color:${tc}">${r.ty}</span></td><td style="font-size:11px;color:var(--text-dim)">${r.u}</td><td><span class="m-tag" style="background:${lc}20;color:${lc}">${r.l?'Live':'Planned'}</span></td></tr>`;});h+='</table>';}
+document.getElementById('modalContent').innerHTML=h;document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+function showTab(n){document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===n));document.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===n));if(n===1&&!window._c){window._c=true;drawCharts();}}
+function drawCharts(){
+new Chart(document.getElementById('catChart'),{type:'doughnut',data:{labels:['R&D','Maintenance','Technology','Ops R&D','Customer'],datasets:[{data:[4530,760,440,110,50],backgroundColor:['#00C9C8','#F4C430','#3B82F6','#A78BFA','#5A6B7D'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw.toLocaleString()} pts (${Math.round(c.raw/5890*100)}%)`}}}}});
+const l=document.getElementById('catLegend');['#00C9C8','#F4C430','#3B82F6','#A78BFA','#5A6B7D'].forEach((c,i)=>{const s=document.createElement('span');s.innerHTML=`<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${c};margin-right:4px"></span>${['R&D 77%','Maintenance 13%','Technology 7%','Ops R&D 2%','Customer 1%'][i]}`;l.appendChild(s)});
+new Chart(document.getElementById('rdChart'),{type:'bar',data:{labels:['WFM US','WFM UK','MX','HCM UK','HCM US','Platform'],datasets:[{label:'Q1',data:[77,85.7,41.7,79.2,53.3,77.6],backgroundColor:'#3B82F660',borderColor:'#3B82F6',borderWidth:1,borderRadius:4},{label:'Q2',data:[77.2,76.1,71.7,79.7,77.3,77.5],backgroundColor:'#00C9C860',borderColor:'#00C9C8',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%',color:'#5A6B7D',font:{size:10}},grid:{color:'#1E345030'}},x:{ticks:{color:'#8899AB',font:{size:10}},grid:{display:false}}},plugins:{legend:{labels:{color:'#8899AB',font:{size:11},boxWidth:10,padding:10}}}}});}
+</script>
+</body>
+</html>
